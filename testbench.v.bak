@@ -1,0 +1,87 @@
+
+module tb_sr;  
+   parameter MSB = 16;        
+   reg data;                 
+   reg clk;                     
+   reg en;                   
+   reg dir;                    
+   reg rstn;                 
+   wire [MSB-1:0] out;       
+    
+   shift_reg  #(MSB) sr0  (  .d (data),  
+                             .clk (clk),  
+                             .en (en),  
+                             .dir (dir),  
+                             .rstn (rstn),  
+                             .out (out));  
+  
+    
+   always #10 clk = ~clk;  
+    
+   initial begin  
+      clk <= 0;  
+      en <= 0;  
+      dir <= 0;  
+      rstn <= 0;  
+      data <= 'h1;  
+   end  
+  
+     
+   initial begin  
+  
+      
+      rstn <= 0;  
+      #20 rstn <= 1;  
+          en <= 1;  
+  
+       
+      repeat (7) @ (posedge clk)  
+         data <= ~data;  
+  
+      #10 dir <= 1;  
+      repeat (7) @ (posedge clk)  
+         data <= ~data;  
+  
+      
+      repeat (7) @ (posedge clk);  
+  
+        
+      $finish;  
+   end  
+  
+   
+   Initial  
+      $monitor ("rstn=%0b data=%b, en=%0b, dir=%0b, out=%b", rstn, data, en, dir, out);  
+endmodule  
+
+module tb_fulladd;  
+    
+   reg [3:0] a;  
+   reg [3:0] b;  
+   reg c_in;  
+   wire [3:0] sum;  
+   integer i;  
+  
+   
+   fulladd  fa0 ( .a (a),  
+                  .b (b),  
+                  .c_in (c_in),  
+                  .c_out (c_out),  
+                  .sum (sum));  
+  
+    
+   initial begin  
+      a <= 0;  
+      b <= 0;  
+      c_in <= 0;  
+  
+      $monitor ("a=0x%0h b=0x%0h c_in=0x%0h c_out=0x%0h sum=0x%0h", a, b, c_in, c_out, sum);  
+  
+       
+      for (i = 0; i < 5; i = i+1) begin  
+         #10 a <= $random;  
+             b <= $random;  
+                 c_in <= $random;  
+      end  
+   end  
+endmodule  
